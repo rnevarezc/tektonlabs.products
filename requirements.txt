@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pydantic[email]
+databases[mysql]
+requests>=2.27.1
+cryptography
+pytest
+kink
+nanoid

@@ -1,0 +1,44 @@
+version: "3.8"
+
+networks:
+  backend:
+    driver: bridge
+
+services:
+  # database:
+  #   platform: linux/x86_64
+  #   image: mysql:8
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "3306:3306"
+  #   networks:
+  #     - backend
+
+  database:
+    image: arm64v8/mysql:oracle
+    restart: always
+    ports:
+      - "3306:3306"
+    env_file:
+      - .env
+    networks:
+      - backend
+
+  svc:
+    build: .
+    env_file:
+      - .env.dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/src
+    working_dir: /src
+    command: uvicorn src.main:app --reload --host 0.0.0.0
+    depends_on:
+      - database
+    links: 
+      - database
+    restart: on-failure
+    networks:
+      - backend
