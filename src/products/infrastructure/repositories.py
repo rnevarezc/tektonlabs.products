@@ -6,8 +6,6 @@ from src.products.domain.repositories import ProductRepository
 from src.products.domain.errors import ProductNotFoundError
 from src.products.infrastructure.schemas import products
 
-import json
-
 class MySQLProductRepository(ProductRepository):
 
     def __init__(self, db: Database) -> None:
@@ -34,6 +32,14 @@ class MySQLProductRepository(ProductRepository):
             products
             .update()
             .where(products.c.ProductId==product.ProductId)
+            .values(**product.dict())
+        )
+        return await self.db.execute(query=query)
+
+    async def create(self, product: Product) -> None:
+        query = (
+            products
+            .insert()
             .values(**product.dict())
         )
         return await self.db.execute(query=query)

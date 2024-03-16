@@ -25,6 +25,13 @@ async def startup():
 async def shutdown():
     await database.disconnect()
 
+@app.exception_handler(ResourceNotFoundError)
+async def resource_not_found_handler(request: Request, exc: ResourceNotFoundError) -> JSONResponse:
+    error_msg = APIErrorMessage(type=exc.__class__.__name__, message=str(exc))
+    return JSONResponse(status_code=404, content=error_msg.dict())
+
+# API main routes...
+# -----------------------------------------------------------------------------
 @app.get("/")
 def index():
     return {
@@ -33,9 +40,3 @@ def index():
     }
 
 app.include_router(products)
-
-
-@app.exception_handler(ResourceNotFoundError)
-async def resource_not_found_handler(request: Request, exc: ResourceNotFoundError) -> JSONResponse:
-    error_msg = APIErrorMessage(type=exc.__class__.__name__, message=str(exc))
-    return JSONResponse(status_code=404, content=error_msg.dict())

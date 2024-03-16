@@ -9,10 +9,11 @@ products = Table(
     metadata,
     Column('ProductId', String(10), primary_key=True),
     Column('Name', String(256)),
-    Column('Status', Boolean),
+    Column('Status', Integer),
     Column('Stock', Integer),
     Column('Description', String(256)),
     Column('Price', Float),
+    Column('Discount', Integer),
     Column('FinalPrice', Float),
     Column('UpdatedAt', DateTime),
     Column('CreatedAt', DateTime)

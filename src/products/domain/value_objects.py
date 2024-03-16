@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import IntEnum
 from typing import Optional, Any
 from pydantic import BaseModel, Field, ValidationError, validator, model_serializer
 from nanoid import generate
@@ -68,6 +68,6 @@ class Price(ValueObject):
         new_price = self.value * (100 - discount.get())/100
         return Price(value=new_price)
 
-class Status(Enum):
+class Status(IntEnum):
     Active = 1
     Inactive = 0

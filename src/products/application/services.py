@@ -15,9 +15,9 @@ class ProductService:
         product = await self.repository.get(ProductId.of(product_id))
         return ProductDTO(**product.dict())
     
-    async def create_product(self, data: ProductInDTO) -> ProductDTO:
-        product = Product.create(**data.dict())
-        await self.repository.save(product)
+    async def create_product(self, request: ProductInDTO) -> ProductDTO:
+        product = Product.create(**request.dict())
+        await self.repository.create(product)
         return ProductDTO(**product.dict())
     
     async def update_discount(self, product_id: str) -> ProductDTO:

@@ -12,7 +12,7 @@ from src.products.domain.value_objects import (
 class Product(BaseModel):  
     ProductId: BaseProductId
     Name: str
-    Status: bool
+    Status: BaseStatus
     Stock: int
     Description: str
     Price: BasePrice
@@ -23,7 +23,7 @@ class Product(BaseModel):
 
     @classmethod
     def create(
-        cls, Name: str, Status: int, Stock: int, Description: str, Price: float
+        cls, Name: str, Status: BaseStatus, Stock: int, Description: str, Price: float
     ) -> "Product":
         return cls(
             ProductId = BaseProductId.new(), 
@@ -40,7 +40,7 @@ class Product(BaseModel):
         cls, 
         ProductId: str, 
         Name: str, 
-        Status: bool, 
+        Status: BaseStatus, 
         Stock: int, 
         Description: str, 
         Price: float,

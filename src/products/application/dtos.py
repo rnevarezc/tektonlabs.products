@@ -11,11 +11,11 @@ class ProductInDTO(BaseModel):
     Stock: int
     Description: str
     Price: float
-    
-    @computed_field
-    def StatusName(self) -> str:
-        return self.Status.name
 
 class ProductDTO(ProductInDTO, BaseProduct):
     Discount: Optional[int] = None
     FinalPrice: Optional[float] = None
+    
+    @computed_field
+    def StatusName(self) -> str:
+        return self.Status.name

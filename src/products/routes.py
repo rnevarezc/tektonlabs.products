@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, status
+from fastapi.responses import JSONResponse, Response
 from kink import di
 
 from src.products.application.dtos import ProductInDTO, ProductDTO
@@ -18,10 +19,19 @@ products = APIRouter()
 )
 async def get_product(id: str, service: ProductService = Depends(lambda: di[ProductService])):
     product = await service.get_by_id(id)
-    
     return product
 
-# @products.post("/products", status_code=201, response_model=ProductDTO)
-# async def add_product(payload: ProductInDTO):    
-#     product = await ProductRepository.save(payload)
-#     return {**product.dict()}
+@products.post(
+    "/products", 
+    response_model=ProductDTO,
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        400: {"model": APIErrorMessage}, 
+        500: {"model": APIErrorMessage}
+    },
+)
+async def create_product(
+    request: ProductInDTO, service: ProductService = Depends(lambda: di[ProductService])
+):    
+    product = await service.create_product(request)
+    return product
