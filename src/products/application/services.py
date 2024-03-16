@@ -18,7 +18,12 @@ class ProductService:
         if not product:
             raise ProductNotFoundError
 
-        return ProductDTO(**product)
+        return ProductDTO(**product.dict())
+    
+    async def create_product(self, data: ProductInDTO) -> ProductDTO:
+        product = Product.create(**data.dict())
+        await self.repository.save(product)
+        return ProductDTO(**product.dict())
     
     async def update_discount(self, product_id: str) -> ProductDTO:
         pass

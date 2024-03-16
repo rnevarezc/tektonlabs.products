@@ -5,21 +5,30 @@ from src.products.domain.value_objects import ProductId
 from src.products.domain.repositories import ProductRepository
 from src.products.infrastructure.schemas import products
 
+import json
+
 class MySQLProductRepository(ProductRepository):
 
     def __init__(self, db: Database) -> None:
         self.db = db
-    
+
     async def get(self, product_id: ProductId) -> Product:
         query = (
-            products.
-            select().
-            where(products.c.ProductId==product_id)
+            products
+            .select()
+            .where(products.c.ProductId==product_id)
         )
-        return await self.db.fetch_one(query=query)
+        record = await self.db.fetch_one(query=query)
+        return Product.make(**record)
 
     def get_all(self) -> list[Product]:
         pass
 
-    def save(self, product: Product) -> None:
-        pass
+    async def save(self, product: Product) -> None:
+        query = (
+            products
+            .update()
+            .where(products.c.ProductId==product.ProductId)
+            .values(**product.dict())
+        )
+        return await self.db.execute(query=query)

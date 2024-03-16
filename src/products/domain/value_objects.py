@@ -1,7 +1,6 @@
 from enum import Enum
-from pydantic import BaseModel
-from typing import Optional
-from dataclasses import dataclass
+from typing import Optional, Any
+from pydantic import BaseModel, Field, ValidationError, validator, model_serializer
 from nanoid import generate
 
 from src.products.domain.errors import (
@@ -10,16 +9,31 @@ from src.products.domain.errors import (
 
 NANO_ID_LENGTH = 10
 
-class ValueObject:
-  """A base class for all value objects"""
+class ValueObject(BaseModel):
+    """A base class for value objects"""
+    value: Any
 
-@dataclass(frozen=True)
-class ProductId:
+    @model_serializer
+    def serialize(self):
+        """ Default serialization
+        By default a Value Object should be
+        serialized into its own value and not 
+        treated as a dict
+        """
+        return self.value
+
+    def __str__(self) -> str:
+        return str(self.value)
+    
+    def get(self):
+        return self.value
+
+class ProductId(ValueObject):
     value: str
 
     @classmethod
     def new(cls) -> "ProductId":
-        return cls(generate(size=NANO_ID_LENGTH))
+        return cls(value = generate(size=NANO_ID_LENGTH))
     
     @classmethod
     def validate(cls, val: str) -> str:
@@ -31,40 +45,29 @@ class ProductId:
     @classmethod
     def of(cls, id: str) -> "ProductId":
         try:
-            return cls(cls.validate(id))
+            return cls(value=cls.validate(id))
         except:
             raise ProductError.invalid_id()
-
-    def __str__(self) -> str:
-        return str(self.value)
-
-@dataclass(frozen=True)
+        
 class Discount(ValueObject):
-    value: int = None
+    value: int = Field(frozen=True)
 
-    # A Discount should not be 100%.
-    def __post_init__(self):
-       if self.value >= 100:
-          raise InvalidDiscountError         
+    @validator("value")
+    def validate(cls, value):
+        # A Discount should not be 100% or negative.
+        if value >= 100 or value <=0:
+            raise InvalidDiscountError        
+        return value
 
-@dataclass(frozen=True)
 class Price(ValueObject):
-    value: int = None
+    value: float = Field(gt=0, frozen=True)
     
-    def __post_init__(self):
-       # Round 2 decimals.
-       self.value = str(round(self.value, 2))
-       
-       # A price cant be negative.
-       if self.value < 0:
-          raise InvalidPriceError          
+    def add_discount(self, discount: Discount):
+        # Add a discount and return the new price.
+        # (VOs are immutable by definition)
+        new_price = self.value * (100 - discount.get())/100
+        return Price(value=new_price)
 
-    # Add a discount and return the new price.
-    def add_discount(self, discount: int):
-       new_price = self.value * (100 - discount)/100
-       return Price(new_price)
-
-@dataclass
-class Status(str, Enum):
-    Active = '1'
-    Inactive = '0'
+class Status(Enum):
+    Active = 1
+    Inactive = 0
