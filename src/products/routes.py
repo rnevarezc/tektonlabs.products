@@ -18,8 +18,7 @@ products = APIRouter()
 )
 async def get_product(id: str, service: ProductService = Depends(lambda: di[ProductService])):
     product = await service.get_by_id(id)
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
+    
     return product
 
 # @products.post("/products", status_code=201, response_model=ProductDTO)
