@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, status
-from fastapi.responses import JSONResponse, Response
+from fastapi import APIRouter, Depends, status, BackgroundTasks
 from kink import di
 
 from src.products.application.dtos import ProductInDTO, ProductDTO
 from src.products.application.services import ProductService
+from src.products.domain.services import DiscountFetcher
 from src.common.errors import APIErrorMessage
 
 products = APIRouter()
@@ -33,9 +33,20 @@ async def get_product(
     },
 )
 async def create_product(
-    request: ProductInDTO, service: ProductService = Depends(lambda: di[ProductService])
+    request: ProductInDTO, 
+    service: ProductService = Depends(lambda: di[ProductService]),
+    tasks: BackgroundTasks = BackgroundTasks
 ) -> ProductDTO:    
     product = await service.create_product(request)
+
+    # Handle the discount fetch and update in the background
+    # This way the consumer doesnt have to wait a chained response.
+    tasks.add_task(
+        service.update_product_discount, 
+        product.ProductId, 
+        di[DiscountFetcher]
+    )
+
     return product
 
 @products.put(

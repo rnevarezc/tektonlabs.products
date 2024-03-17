@@ -46,7 +46,6 @@ class ProductId(ValueObject):
     def validate(cls, val: str) -> str:
         val = val.strip()
         assert len(val) == NANO_ID_LENGTH, f"length must be {NANO_ID_LENGTH}"
-        assert val.isalnum(), "must be alphanumeric"
         return val
 
     @classmethod
@@ -67,9 +66,18 @@ class Discount(ValueObject):
         return value
 
 class Price(ValueObject):
-    value: float = Field(gt=0, frozen=True)
+    value: float = Field(frozen=True)
     
-    def add_discount(self, discount: Discount | int):
+    @validator("value")
+    def validate(cls, value):
+        # A price should not be negative.
+        if value <=0:
+            raise InvalidPriceError
+        
+        # Price is rounded to two decimals
+        return round(value,2)
+
+    def add_discount(self, discount: int):
 
         """ Add a discount and return the new price.
         (VOs are immutable by definition)

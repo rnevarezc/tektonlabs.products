@@ -59,7 +59,7 @@ class Product(BaseModel):
     def update_discount(self, discount: int):
         if discount:
             self.Discount = BaseDiscount.of(discount)
-            self.FinalPrice = self.Price.add_discount(self.Discount)
+            self.FinalPrice = self.Price.add_discount(discount)
             self.touch()
 
     def update(self, **data) -> None:
