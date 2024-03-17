@@ -1,6 +1,6 @@
 fastapi
 uvicorn
-pydantic[email]
+pydantic
 databases[mysql]
 requests>=2.27.1
 cryptography
