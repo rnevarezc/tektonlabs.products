@@ -27,6 +27,13 @@ class ValueObject(BaseModel):
     
     def get(self):
         return self.value
+    
+    @classmethod
+    def of(cls, value):
+        if isinstance(value, cls):
+            return value
+        
+        return cls(value=value)
 
 class ProductId(ValueObject):
     value: str
@@ -62,9 +69,13 @@ class Discount(ValueObject):
 class Price(ValueObject):
     value: float = Field(gt=0, frozen=True)
     
-    def add_discount(self, discount: Discount):
-        # Add a discount and return the new price.
-        # (VOs are immutable by definition)
+    def add_discount(self, discount: Discount | int):
+
+        """ Add a discount and return the new price.
+        (VOs are immutable by definition)
+        """
+        discount = Discount.of(discount)
+
         new_price = self.value * (100 - discount.get())/100
         return Price(value=new_price)
 

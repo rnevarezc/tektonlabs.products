@@ -9,14 +9,14 @@ from src.products.domain.value_objects import (
     Discount as BaseDiscount
 )
 
-class Product(BaseModel):  
+class Product(BaseModel): 
     ProductId: BaseProductId
     Name: str
     Status: BaseStatus
     Stock: int
     Description: str
     Price: BasePrice
-    Discount: int | None = None
+    Discount: BaseDiscount | None = None
     FinalPrice: BasePrice | None = None
     CreatedAt: datetime | None = None
     UpdatedAt: datetime | None = None
@@ -24,7 +24,9 @@ class Product(BaseModel):
     @classmethod
     def create(
         cls, Name: str, Status: BaseStatus, Stock: int, Description: str, Price: float
-    ) -> "Product":
+    ) -> "Product":     
+        """ Factory method to create a Product from primitive data
+        """
         return cls(
             ProductId = BaseProductId.new(), 
             Name=Name, 
@@ -36,32 +38,48 @@ class Product(BaseModel):
         )
     
     @classmethod
-    def make(
-        cls, 
-        ProductId: str, 
-        Name: str, 
-        Status: BaseStatus, 
-        Stock: int, 
-        Description: str, 
-        Price: float,
-        Discount: int = None,
-        FinalPrice: float = None,
-        CreatedAt: datetime = None,
-        UpdatedAt: datetime = None
-    )-> "Product":        
-        return cls(
-            ProductId = BaseProductId.of(ProductId), 
-            Name=Name, 
-            Status=Status, 
-            Stock=Stock, 
-            Description=Description, 
-            Price = BasePrice(value=Price)
+    def make(cls, **data)-> "Product":
+        """ Factory method to make a Product instance from primitive data     
+        """
+        # Extract the primitives to convert to VO
+        ProductId, Price, Discount, FinalPrice = map(
+            data.get, (
+                'ProductId', 'Price', 'Discount', 'FinalPrice'
+            )
         )
 
+        # Update the data dict.
+        data.update({'ProductId': BaseProductId.of(ProductId)})
+        data.update({'Price': BasePrice.of(Price)})
+        data.update({'Discount': BaseDiscount.of(Discount) if Discount else None})
+        data.update({'FinalPrice': BasePrice.of(FinalPrice) if FinalPrice else None})
+
+        return cls(**data)
+
     def update_discount(self, discount: int):
-        self.Discount = BaseDiscount(value=discount)
-        self.FinalPrice = self.Price.add_discount(self.Discount)
+        if discount:
+            self.Discount = BaseDiscount.of(discount)
+            self.FinalPrice = self.Price.add_discount(self.Discount)
+            self.touch()
+
+    def update(self, **data) -> None:
+        # Map Data Attributes
+        Name, Description, Stock, Price = map(
+            data.get, (
+                'Name', 'Description', 'Stock', 'Price'
+            )
+        )
+        self.Name = Name
+        self.Description = Description
+        self.Stock = Stock
+        self.Price = BasePrice.of(Price)
+
+        if Price:
+            self.update_discount(self.Discount)
+        
         self.touch()
 
     def touch(self):
         self.UpdatedAt = datetime.now()
+
+        
