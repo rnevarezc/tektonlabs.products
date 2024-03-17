@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, computed_field
 from typing import Optional
 from src.products.domain.value_objects import Status as BaseStatus
+from datetime import datetime
 
 class BaseProduct(BaseModel):
     ProductId: str
@@ -15,6 +16,7 @@ class ProductInDTO(BaseModel):
 class ProductDTO(ProductInDTO, BaseProduct):
     Discount: Optional[int] = None
     FinalPrice: Optional[float] = None
+    CreatedAt: Optional[datetime] = None
     
     @computed_field
     def StatusName(self) -> str:

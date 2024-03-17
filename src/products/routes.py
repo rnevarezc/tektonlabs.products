@@ -17,7 +17,9 @@ products = APIRouter()
         500: {"model": APIErrorMessage}
     },
 )
-async def get_product(id: str, service: ProductService = Depends(lambda: di[ProductService])):
+async def get_product(
+    id: str, service: ProductService = Depends(lambda: di[ProductService])
+) -> ProductDTO:
     product = await service.get_by_id(id)
     return product
 
@@ -32,6 +34,22 @@ async def get_product(id: str, service: ProductService = Depends(lambda: di[Prod
 )
 async def create_product(
     request: ProductInDTO, service: ProductService = Depends(lambda: di[ProductService])
-):    
+) -> ProductDTO:    
     product = await service.create_product(request)
+    return product
+
+@products.put(
+    "/products/{id}",
+    response_model=ProductDTO,
+    responses={
+        400: {"model": APIErrorMessage}, 
+        404: {"model": APIErrorMessage}, 
+        500: {"model": APIErrorMessage}
+    }
+)
+async def update(
+    id: str, request: ProductInDTO, service: ProductService = Depends(lambda: di[ProductService])
+) -> ProductDTO:
+    
+    product = await service.update_product(id, request)
     return product
