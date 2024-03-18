@@ -5,5 +5,7 @@ databases[mysql]
 requests>=2.27.1
 cryptography
 pytest
+pytest-asyncio
 kink
 nanoid
+httpx

@@ -58,7 +58,7 @@ async def create_product(
         500: {"model": APIErrorMessage}
     }
 )
-async def update(
+async def update_product(
     id: str, request: ProductInDTO, service: ProductService = Depends(lambda: di[ProductService])
 ) -> ProductDTO:
     

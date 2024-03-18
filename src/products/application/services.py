@@ -14,20 +14,20 @@ class ProductService:
 
     async def get_by_id(self, product_id: str) -> ProductDTO:
         product = await self.repository.get(ProductId.of(product_id))
-        return ProductDTO(**product.dict())
+        return ProductDTO(**product.model_dump())
     
     async def create_product(self, request: ProductInDTO) -> ProductDTO:
-        product = Product.create(**request.dict())
+        product = Product.create(**request.model_dump())
         await self.repository.create(product)
-        return ProductDTO(**product.dict())
+        return ProductDTO(**product.model_dump())
     
     async def update_product(
         self, product_id: str, request: ProductInDTO
     ) -> ProductDTO:    
         product = await self.repository.get(ProductId.of(product_id))
-        product.update(**request.dict())
+        product.update(**request.model_dump())
         await self.repository.save(product)
-        return ProductDTO(**product.dict())
+        return ProductDTO(**product.model_dump())
     
     async def fetch_product_discount(
         self, product_id: str, discount_fetcher: DiscountFetcher
@@ -46,6 +46,6 @@ class ProductService:
         if discount:
             product.update_discount(discount.get())
             await self.repository.save(product)
-            return ProductDTO(**product.dict())
+            return ProductDTO(**product.model_dump())
         
         return None

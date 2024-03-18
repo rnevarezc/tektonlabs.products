@@ -64,12 +64,13 @@ class Product(BaseModel):
 
     def update(self, **data) -> None:
         # Map Data Attributes
-        Name, Description, Stock, Price = map(
+        Name, Status, Description, Stock, Price = map(
             data.get, (
-                'Name', 'Description', 'Stock', 'Price'
+                'Name', 'Status','Description', 'Stock', 'Price'
             )
         )
         self.Name = Name
+        self.Status = Status
         self.Description = Description
         self.Stock = Stock
         self.Price = BasePrice.of(Price)

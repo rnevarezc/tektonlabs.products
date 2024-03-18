@@ -1,6 +1,6 @@
 from enum import IntEnum
 from typing import Optional, Any
-from pydantic import BaseModel, Field, ValidationError, validator, model_serializer
+from pydantic import BaseModel, Field, ConfigDict, field_validator, model_serializer
 from nanoid import generate
 
 from src.products.domain.errors import (
@@ -11,6 +11,7 @@ NANO_ID_LENGTH = 10
 
 class ValueObject(BaseModel):
     """A base class for value objects"""
+    model_config = ConfigDict(frozen=True)
     value: Any
 
     @model_serializer
@@ -58,7 +59,8 @@ class ProductId(ValueObject):
 class Discount(ValueObject):
     value: int = Field(frozen=True)
 
-    @validator("value")
+    @field_validator('value')
+    @classmethod
     def validate(cls, value):
         # A Discount should not be 100% or negative.
         if value >= 100 or value <=0:
@@ -68,7 +70,8 @@ class Discount(ValueObject):
 class Price(ValueObject):
     value: float = Field(frozen=True)
     
-    @validator("value")
+    @field_validator('value')
+    @classmethod
     def validate(cls, value):
         # A price should not be negative.
         if value <=0:

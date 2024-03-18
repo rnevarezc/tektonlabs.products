@@ -1,3 +1,4 @@
+import copy
 from databases import Database
 
 from src.products.domain.entities import Product
@@ -5,6 +6,7 @@ from src.products.domain.value_objects import ProductId
 from src.products.domain.repositories import ProductRepository
 from src.products.domain.errors import ProductNotFoundError
 from src.products.infrastructure.schemas import products
+
 
 class MySQLProductRepository(ProductRepository):
 
@@ -43,3 +45,22 @@ class MySQLProductRepository(ProductRepository):
             .values(**product.dict())
         )
         return await self.db.execute(query=query)
+
+
+class InMemoryProductRepository(ProductRepository):
+
+    def __init__(self) -> None:
+        self.products = dict = {}
+
+    async def get(self, product_id: ProductId) -> Product:
+        try:
+            return copy.deepcopy(self.products[product_id])
+        except KeyError as error:
+            print (f"In repo: {product_id}")
+            raise ProductNotFoundError(f"A record was not found with the '{product_id}' ID")
+
+    async def save(self, product: Product) -> None:
+        self.products[product.ProductId] = copy.deepcopy(product)
+
+    async def create(self, product: Product) -> None:
+        self.products[product.ProductId] = copy.deepcopy(product)

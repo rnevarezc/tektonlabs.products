@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
+from contextlib import asynccontextmanager
 
 from src.common.db import database
 from src.common.errors import APIErrorMessage, ResourceNotFoundError
@@ -10,24 +11,23 @@ from src.common.middlewares import RouterLoggingMiddleware
 import logging
 import src.common.logs
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await database.connect()
+    yield
+    await database.disconnect()
+
 app = FastAPI(
     title ="Tektonlabs Products Microservice",
     description = "A small challenge from Tektonlabs of a products microservice",
     version="1.0.0",
+    lifespan = lifespan
 )
 
 app.add_middleware(
     RouterLoggingMiddleware,
     logger=logging.getLogger(__name__)
 )
-
-@app.on_event("startup")
-async def startup():
-    await database.connect()
-
-@app.on_event("shutdown")
-async def shutdown():
-    await database.disconnect()
 
 # This will create the DB schema and trigger the "after_create" event
 # @app.on_event("startup")

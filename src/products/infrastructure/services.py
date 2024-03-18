@@ -5,7 +5,6 @@ from src.products.domain.value_objects import ProductId, Discount
 import requests
 import random
 
-
 class MockAPIDiscountFetcher(DiscountFetcher):
 
     endpoint: str = "https://65f74b95b4f842e80885718b.mockapi.io/discounts"
@@ -22,8 +21,7 @@ class MockAPIDiscountFetcher(DiscountFetcher):
         # (Mock Data was constructed with IDs from 6 to 28)
         product_id = str(random.randint(6,28))
 
-        return requests.get(f"{self.endpoint}/{product_id}")
-        
+        return requests.get(f"{self.endpoint}/{product_id}")        
 
     async def fetch(self, product_id: ProductId) -> Discount | None:
         """ Concrete implementation to fetch a discount

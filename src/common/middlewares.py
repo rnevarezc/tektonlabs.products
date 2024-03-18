@@ -9,33 +9,23 @@ from starlette.types import Message
 
 class RouterLoggingMiddleware(BaseHTTPMiddleware):
     """
-        Logging Middleware
-            @link: https://medium.com/@dhavalsavalia/fastapi-logging-middleware-logging-requests-and-responses-with-ease-and-style-201b9aa4001a
+    Logging Middleware
+    @link: https://medium.com/@dhavalsavalia/fastapi-logging-middleware-logging-requests-and-responses-with-ease-and-style-201b9aa4001a
     """
-    def __init__(
-            self,
-            app: FastAPI,
-            *,
-            logger: logging.Logger
-    ) -> None:
+    def __init__(self, app: FastAPI, *, logger: logging.Logger) -> None:
         self._logger = logger
         super().__init__(app)
    
-    async def dispatch(self,
-                       request: Request,
-                       call_next: Callable
-                       ) -> Response:
-    
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
         request_id: str = str(uuid4())
         logging_dict = {
             "X-API-REQUEST-ID": request_id  # X-API-REQUEST-ID maps each request-response to a unique ID
         }
 
         await self.set_body(request)
-        response, response_dict = await self._log_response(call_next,
-                                                           request,
-                                                           request_id
-                                                           )
+        response, response_dict = await self._log_response(
+            call_next, request, request_id
+        )
         request_dict = await self._log_request(request)
         logging_dict["request"] = request_dict
         logging_dict["response"] = response_dict
@@ -60,16 +50,12 @@ class RouterLoggingMiddleware(BaseHTTPMiddleware):
 
         request._receive = receive
 
-    async def _log_request(
-            self,
-            request: Request
-    ) -> str:
-        """Logs request part
-            Arguments:
-           - request: Request
-
+    async def _log_request(self, request: Request) -> str:
         """
-
+        Logs request part
+        Arguments:
+        - request: Request
+        """
         path = request.url.path
         if request.query_params:
             path += f"?{request.query_params}"
@@ -88,20 +74,18 @@ class RouterLoggingMiddleware(BaseHTTPMiddleware):
 
         return request_logging
     
-    async def _log_response(self,
-                            call_next: Callable,
-                            request: Request,
-                            request_id: str
-                            ) -> Response:
-        """Logs response part
-
-               Arguments:
-               - call_next: Callable (To execute the actual path function and get response back)
-               - request: Request
-               - request_id: str (uuid)
-               Returns:
-               - response: Response
-               - response_logging: str
+    async def _log_response(
+        self, call_next: Callable, request: Request, request_id: str
+    ) -> Response:
+        """
+        Logs response part
+        Arguments:
+        - call_next: Callable (To execute the actual path function and get response back)
+        - request: Request
+        - request_id: str (uuid)
+        Returns:
+        - response: Response
+        - response_logging: str
         """
 
         start_time = time.perf_counter()
@@ -130,21 +114,20 @@ class RouterLoggingMiddleware(BaseHTTPMiddleware):
 
         return response, response_logging
 
-    async def _execute_request(self,
-                               call_next: Callable,
-                               request: Request,
-                               request_id: str
-                               ) -> Response:
-        """Executes the actual path function using call_next.
-               It also injects "X-API-Request-ID" header to the response.
+    async def _execute_request(
+        self, call_next: Callable, request: Request, request_id: str
+    ) -> Response:
+        """
+        Executes the actual path function using call_next.
+        It also injects "X-API-Request-ID" header to the response.
 
-               Arguments:
-               - call_next: Callable (To execute the actual path function
-                            and get response back)
-               - request: Request
-               - request_id: str (uuid)
-               Returns:
-               - response: Response
+        Arguments:
+        - call_next: Callable (To execute the actual path function
+                    and get response back)
+        - request: Request
+        - request_id: str (uuid)
+        Returns:
+        - response: Response
         """
         try:
             response: Response = await call_next(request)

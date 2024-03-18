@@ -9,9 +9,9 @@ class ProductRepository(ABC):
     async def get(self, product_id: ProductId) -> Product:
         pass
 
-    @abstractmethod
-    async def get_all(self) -> list[Product]:
-        pass
+    # @abstractmethod
+    # async def get_all(self) -> list[Product]:
+    #     pass
 
     @abstractmethod
     async def save(self, product: Product) -> None:
