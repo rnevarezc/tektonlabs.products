@@ -8,6 +8,7 @@ from src.common.errors import APIErrorMessage, ResourceNotFoundError
 from src.products.routes import products
 from src.common.middlewares import RouterLoggingMiddleware
 
+import os
 import logging
 import src.common.logs
 
@@ -24,10 +25,11 @@ app = FastAPI(
     lifespan = lifespan
 )
 
-app.add_middleware(
-    RouterLoggingMiddleware,
-    logger=logging.getLogger(__name__)
-)
+# Only Add the HTTP Middleware if we are not in testing mode :)
+if os.getenv('ENVIRONMENT') != "testing":
+    app.add_middleware(
+        RouterLoggingMiddleware,logger=logging.getLogger(__name__)
+    )
 
 # This will create the DB schema and trigger the "after_create" event
 # @app.on_event("startup")
