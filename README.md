@@ -2,7 +2,7 @@
 
 A small challenge from Tektonlabs of a products microservice to use as a showcase of clean code patterns, software architecture skills and cloud app development.
 
-It was developed pretty fast using Python 3.12 and a combination of:
+It was developed using Python 3.12 and a combination of:
 
 - FastAPI(pydantic, uvicorn, sqlachemy, requests, pytest, kink) 
 - MySQL database. 
@@ -58,17 +58,18 @@ You can also check the pretty auto-generated API documentation in http://localho
 
 ## Installation & Execution
 
-Clone the project and execute this command (You need Docker installed in your system):
+Clone the project and execute this command in the root folder of the project (You need Docker installed in your system):
 
 ```bash
 $ docker-compose up
 ```
 
-To test the application, visit the [home page](http://localhost:8000/). You should get the following message:
+To test the application, visit the URL: [http://localhost:8000/](http://localhost:8000/). You should get the following message:
+
 ```json
 {
-    'title': "This is the products microservice",
-    'version': '1.0.0'
+    "title": "This is the products microservice",
+    "version": "1.0.0"
 }
   
 ```
@@ -95,14 +96,14 @@ src
 
 ## Running Tests
 
-To run tests, connect to the running docker container using the command:
+To run tests, yo have to connect to the running docker container using the command:
 
 ```bash
   docker ps
   docker exec -it [CONTAINER_ID] bash
 ```
 
-Then run the following command in bash
+And then run the following command in bash
 
 ```bash
   pytest -v
