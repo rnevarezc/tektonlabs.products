@@ -1,10 +1,8 @@
 FROM python:3.12-alpine
 
-ENV PORT=8000
+WORKDIR /app
 
-WORKDIR /usr/src/app
-
-COPY requirements.txt .
+COPY requirements.txt /app/requirements.txt
 
 # Install alpine base dependencies 
 # then upgrade an install pip requirements 
@@ -16,9 +14,11 @@ RUN apk add build-base && \
     pip install --no-cache-dir -r requirements.txt && \ 
     apk del build-base && \ 
     apk del gcc musl-dev python3-dev libffi-dev openssl-dev && \
-    rm -rf /var/cache/apk/*
+    rm -rf /var/cache/apk/*x
 
-COPY ./src /src
+COPY ./server.py /app/server.py
 
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]
+COPY ./src /app/src
 
+# CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD [ "python3", "server.py" ]

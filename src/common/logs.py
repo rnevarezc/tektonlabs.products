@@ -11,7 +11,7 @@ config = {
     },
     "handlers": {
         "console": {
-            "level": "DEBUG",
+            "level": "INFO",
             "class": "logging.StreamHandler",
             "formatter": "simple",
             "stream": sys.stdout,
@@ -24,7 +24,7 @@ config = {
         }
     },
     "root": {
-        "level": "DEBUG",
+        "level": "INFO",
         "handlers": [
             "console", "file"
         ],

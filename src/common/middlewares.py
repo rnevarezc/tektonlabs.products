@@ -22,7 +22,8 @@ class RouterLoggingMiddleware(BaseHTTPMiddleware):
             "X-API-REQUEST-ID": request_id  # X-API-REQUEST-ID maps each request-response to a unique ID
         }
 
-        await self.set_body(request)
+        # Commented to Avoid weird logging issues.
+        # await self.set_body(request)
         response, response_dict = await self._log_response(
             call_next, request, request_id
         )

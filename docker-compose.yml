@@ -9,7 +9,7 @@ services:
   #   platform: linux/x86_64
   #   image: mysql:8
   #   env_file:
-  #     - .env
+  #     - .env.dev
   #   ports:
   #     - "3306:3306"
   #   networks:
@@ -21,7 +21,7 @@ services:
     ports:
       - "3306:3306"
     env_file:
-      - .env
+      - .env.dev
     networks:
       - backend
 
@@ -32,8 +32,8 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - .:/src
-    working_dir: /src
+      - .:/app
+    working_dir: /app
     command: uvicorn src.main:app --reload --host 0.0.0.0
     depends_on:
       - database
