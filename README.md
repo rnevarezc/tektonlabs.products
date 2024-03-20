@@ -58,7 +58,9 @@ You can also check the pretty auto-generated API documentation in http://localho
 
 ## Installation & Execution
 
-Clone the project and execute this command in the root folder of the project (You need Docker installed in your system):
+### Using docker compose
+
+Clone the project locally and execute this command in the root folder of the project (you need Docker installed in your system):
 
 ```bash
 $ docker-compose up
@@ -73,6 +75,18 @@ To test the application, visit the URL: [http://localhost:8000/](http://localhos
 }
   
 ```
+
+### Database Migration
+
+#### Minimum Viable Product approach
+
+The first time you have to connect to the local database on the port ```3306``` using your Preferred SQL Client and execute the first migration manually. 
+
+The SQL schema is located in ```./migrations/products/schemas.sql```
+
+Default development user and password are included in the provided ```.env.dev``` file 
+
+**To-do:** Execute migrations automatically using [alembic](https://alembic.sqlalchemy.org)
     
 ## Project Structure
 
