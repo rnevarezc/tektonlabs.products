@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 
 from src.common.db import database
-from src.common.errors import APIErrorMessage, ResourceNotFoundError
+from src.common.errors import APIErrorMessage, ResourceNotFoundError, DomainError
 from src.products.routes import products
 from src.common.middlewares import RouterLoggingMiddleware
 
@@ -36,10 +36,18 @@ if os.getenv('ENVIRONMENT') != "testing":
 # def configure():
 #     metadata.create_all(bind=engine)
 
+@app.exception_handler(DomainError)
+async def domain_error_handler(request: Request, exc: DomainError) -> JSONResponse:
+    error_msg = APIErrorMessage(type=exc.__class__.__name__, message=f"Oops! {exc}")
+    return JSONResponse(
+        status_code=400,
+        content=error_msg.model_dump(),
+    )
+
 @app.exception_handler(ResourceNotFoundError)
 async def resource_not_found_handler(request: Request, exc: ResourceNotFoundError) -> JSONResponse:
     error_msg = APIErrorMessage(type=exc.__class__.__name__, message=str(exc))
-    return JSONResponse(status_code=404, content=error_msg.dict())
+    return JSONResponse(status_code=404, content=error_msg.model_dump())
 
 # API main routes...
 # -----------------------------------------------------------------------------
